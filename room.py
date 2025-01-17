@@ -1,34 +1,38 @@
 class Room:
     def __init__(self, room_name):
-        self.name = room_name
-        self.description = None
+        self._name = room_name
+        self._description = None
         self.linked_rooms = {}
 
-    def get_description(self):
-        return self.description
+    @property
+    def description(self):
+        return self._description
 
-    def set_description(self, room_description):
-        self.description = room_description
+    @description.setter
+    def description(self, room_description):
+        self._description = room_description
 
     def describe(self):
         print(self.description)
 
-    def set_name(self, room_name):
-        self.name = room_name
+    @property
+    def name(self):
+        return self._name
 
-    def get_name(self):
-        return self.name
+    @name.setter
+    def name(self, room_name):
+        self._name = room_name
 
     def link_room(self, room_to_link, direction):
         self.linked_rooms[direction] = room_to_link
 
     def get_details(self):
-        print(self.name)
+        print(self._name)
         print("--------------------")
         print(self.description)
         for direction in self.linked_rooms:
             room = self.linked_rooms[direction]
-            print(f"The {room.get_name()} is {direction}.")
+            print(f"The {room.name} is {direction}.")
 
     def move(self, direction):
         if direction in self.linked_rooms:
