@@ -13,7 +13,7 @@ class Room:
         self._description = room_description
 
     def describe(self):
-        print(self.description)
+        print(self._description)
 
     @property
     def name(self):
