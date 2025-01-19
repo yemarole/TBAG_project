@@ -3,6 +3,7 @@ class Room:
         self._name = room_name
         self._description = None
         self.linked_rooms = {}
+        self._character = None
 
     @property
     def description(self):
@@ -23,6 +24,14 @@ class Room:
     def name(self, room_name):
         self._name = room_name
 
+    @property
+    def character(self):
+        return self._character
+
+    @character.setter
+    def character(self, new_character):
+        self._character = new_character
+
     def link_room(self, room_to_link, direction):
         self.linked_rooms[direction] = room_to_link
 
@@ -33,6 +42,8 @@ class Room:
         for direction in self.linked_rooms:
             room = self.linked_rooms[direction]
             print(f"The {room.name} is {direction}.")
+        if self.character is not None:
+            print(f"{self._character.name} is here!")
 
     def move(self, direction):
         if direction in self.linked_rooms:
