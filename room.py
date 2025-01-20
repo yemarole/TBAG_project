@@ -36,14 +36,14 @@ class Room:
         self.linked_rooms[direction] = room_to_link
 
     def get_details(self):
-        print(self._name)
+        print(f"You are now in the {self._name}")
         print("--------------------")
         print(self.description)
         for direction in self.linked_rooms:
             room = self.linked_rooms[direction]
             print(f"The {room.name} is {direction}.")
         if self.character is not None:
-            print(f"{self._character.name} is here!")
+            print(f"{self._character.name} is in this room!")
 
     def move(self, direction):
         if direction in self.linked_rooms:

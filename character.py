@@ -6,7 +6,6 @@ class Character:
         self.conversation = None
 
     def describe(self):
-        print(f"{self.name} is in this room!")
         print(self.description)
 
     def set_conversation(self, conversation):

@@ -32,6 +32,9 @@ while True:
     inhabitant = current_room.character
     if inhabitant is not None:
         inhabitant.describe()
+        print(
+            f"[If you want to talk then type 'talk' & if you want to fight type 'fight']"
+        )
 
     command = input("> ")
 
