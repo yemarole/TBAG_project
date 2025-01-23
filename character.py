@@ -40,3 +40,6 @@ class Enemy(Character):
         else:
             print(f"{self.name} crushes you, puny adventurer!")
             return False
+
+    def steal(self):
+        pass
