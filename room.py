@@ -4,6 +4,8 @@ class Room:
         self._description = None
         self.linked_rooms = {}
         self._character = None
+        self.items = []
+        self.locked = False
 
     @property
     def description(self):
@@ -32,8 +34,10 @@ class Room:
     def character(self, new_character):
         self._character = new_character
 
-    def link_room(self, room_to_link, direction):
+    def link_room(self, room_to_link, direction, locked=False):
         self.linked_rooms[direction] = room_to_link
+        if locked:
+            room_to_link.locked = True
 
     def get_details(self):
         print(f"You are now in the {self._name}")
@@ -44,6 +48,21 @@ class Room:
             print(f"The {room.name} is {direction}.")
         if self.character is not None:
             print(f"{self._character.name} is in this room!")
+        if self.items:
+            print("You see the following items:")
+            for item in self.items:
+                print(f"- {item.name}: {item.description}")
+
+    def add_item(self, item):
+        self.items.append(item)
+
+    def remove_item(self, item):
+        if item in self.items:
+            self.items.remove(item)
+
+    def unlock(self):
+        self.locked = False
+        print(f"The door to the {self.name} is now unlocked.")
 
     def move(self, direction):
         if direction in self.linked_rooms:
