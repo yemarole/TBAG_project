@@ -1,3 +1,6 @@
+from item import Weapon
+
+
 class Character:
 
     def __init__(self, char_name, char_description):
@@ -46,6 +49,7 @@ class Enemy(Character):
         self.weakness = None
         self.bribed = False
         self.asleep = False
+        self.health = 100
 
     def set_weakness(self, weakness):
         self.weakness = weakness
@@ -57,9 +61,29 @@ class Enemy(Character):
         if combat_item == self.weakness:
             print(f"You have defeated {self.name} with the {combat_item}!")
             return True
+        elif isinstance(combat_item, Weapon):
+            self.health -= combat_item.damage
+            if self.health <= 0:
+                print(f"You have defeated {self.name} with the {combat_item.name}!")
+                return True
+            else:
+                print(
+                    f"You attacked {self.name} with {combat_item.name}. {self.name}'s health is now {self.health}."
+                )
+                return False
         else:
             print(f"{self.name} crushes you, puny adventurer!")
             return False
+
+    def transfer_items2player(self, player_inventory):
+        if self.inventory:
+            print(f"You collected the following from {self.name}:")
+            for item in self.inventory:
+                player_inventory.append(item)
+                print(f" -{item.name}")
+            self.inventory.clear()
+        else:
+            print(f"{self.name} has no items to collect.")
 
     def steal(self):
         pass
@@ -97,3 +121,6 @@ class Friend(Character):
         print(
             f"You gifted {self.name} a {gift.name}. Friendship level is now {self.friendship_level}"
         )
+
+    def can_take_item(self):
+        return self.friendship_level >= 3
