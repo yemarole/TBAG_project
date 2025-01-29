@@ -103,6 +103,9 @@ class Enemy(Character):
         else:
             print(f"{self.name} is already asleep.")
 
+    def is_asleep(self):
+        return self.asleep
+
 
 class Friend(Character):
     def __init__(self, char_name, char_description):

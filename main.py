@@ -82,7 +82,7 @@ while True:
         inhabitant.describe()
         inhabitant.list_items()
     print(
-        "[Type: 'talk', 'hug', 'gift [item]', 'pick up [item]', 'fight', 'sleep', 'inventory', 'take [item]', 'drop [item]', 'unlock [direction]' or any direction]"
+        "[Type: 'talk', 'hug', 'gift [item]', 'pick up [item]', 'fight', 'sleep', 'steal [item]', 'inventory', 'take [item]', 'drop [item]', 'unlock [direction]' or any direction]"
     )
 
     command = input("> ")
@@ -171,18 +171,43 @@ while True:
 
     elif command.startswith("take "):
         item_name = command.split(" ", 1)[1]
-        if isinstance(inhabitant, Friend) and not inhabitant.can_take_item():
-            print(
-                f"You need a higher friendship level to take items from {inhabitant.name}."
-            )
-        else:
-            item = next((i for i in inhabitant.inventory if i.name == item_name), None)
-            if item:
-                inventory.append(item)
-                inhabitant.remove_item(item)
-                print(f"\n You just took {item_name} from {inhabitant.name}!")
+        if isinstance(inhabitant, Friend):
+            if not inhabitant.can_take_item():
+                print(
+                    f"You need a higher friendship level to take items from {inhabitant.name}."
+                )
             else:
-                print(f"There is no {item_name} here.")
+                item = next(
+                    (i for i in inhabitant.inventory if i.name == item_name), None
+                )
+                if item:
+                    inventory.append(item)
+                    inhabitant.remove_item(item)
+                    print(f"\n You just took {item_name} from {inhabitant.name}!")
+                else:
+                    print(f"There is no {item_name} here.")
+        else:
+            print("You can only take items from a friend.")
+
+    elif command.startswith("steal "):
+        item_name = command.split(" ", 1)[1]
+        if isinstance(inhabitant, Enemy):
+            if inhabitant.is_asleep():
+                item = next(
+                    (i for i in inhabitant.inventory if i.name == item_name), None
+                )
+                if item:
+                    inventory.append(item)
+                    inhabitant.remove_item(item)
+                    print(f"\n You just stole {item_name} from {inhabitant.name}!")
+                else:
+                    print(f"There is no {item_name} here.")
+            else:
+                print(
+                    f"You can only steal from {inhabitant.name} when they are asleep."
+                )
+        else:
+            print("You can only steal items from an enemy.")
 
     elif command.startswith("drop "):
         item_name = command.split(" ", 1)[1]
