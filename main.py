@@ -1,77 +1,76 @@
 import re
-import sys
-import os
 from room import Room
-from character import Enemy, Character, Friend
+from character import Enemy, Friend
 from item import Item, Weapon
 
-# Set up rooms
-kitchen = Room("kitchen")
-ballroom = Room("ballroom")
-dining_hall = Room("dining hall")
 
-# Set descriptions
-kitchen.description = "A dank and dirty room buzzing with flies."
-ballroom.description = "A vast room with shiny wooden floors."
-dining_hall.description = "A large room with ornate golden decorations on each wall."
+def initialize_game():
+    global kitchen, ballroom, dining_hall, inventory, current_room
 
-# Set room orientation
-kitchen.link_room(dining_hall, "south", locked=True)
-dining_hall.link_room(kitchen, "north")
-dining_hall.link_room(ballroom, "west", locked=True)
-ballroom.link_room(dining_hall, "east")
+    # Set up rooms
+    kitchen = Room("kitchen")
+    ballroom = Room("ballroom")
+    dining_hall = Room("dining hall")
 
-# Create Items
-knife = Weapon("knife", "a sharp kitchen knife", 20)
-sword = Weapon("sword", "an heat imbued magic sword", 50)
-shield = Weapon("shield", "a sturdy shield", 5)
-purified_water = Item("purified water", "a bottle of purified water")
-key = Item("key", "A gold master key that can unlock any door.")
-cheese = Item("cheese", "A block of stilton")
+    # Set descriptions
+    kitchen.description = "A dank and dirty room buzzing with flies."
+    ballroom.description = "A vast room with shiny wooden floors."
+    dining_hall.description = (
+        "A large room with ornate golden decorations on each wall."
+    )
 
-# Add items to rooms
-kitchen.add_item(knife)
-kitchen.add_item(cheese)
-dining_hall.add_item(shield)
+    # Set room orientation
+    kitchen.link_room(dining_hall, "south", locked=True)
+    dining_hall.link_room(kitchen, "north")
+    dining_hall.link_room(ballroom, "west", locked=True)
+    ballroom.link_room(dining_hall, "east")
 
-# Create Dave the Zombie
-dave = Enemy("Dave", "Dave is a lactose intolerant zombie")
-dave.set_conversation("Brrlgrh... must eat... rgrhl... braaaiinnnsss...")
-dave.set_weakness(cheese)
-dave.add_item(purified_water)
+    # Create Items
+    knife = Weapon("knife", "a sharp kitchen knife", 20)
+    sword = Weapon("sword", "an heat imbued magic sword", 50)
+    shield = Weapon("shield", "a sturdy shield", 5)
+    purified_water = Item("purified water", "a bottle of purified water")
+    key = Item("key", "A gold master key that can unlock any door.")
+    cheese = Item("cheese", "A block of stilton")
 
-dining_hall.character = dave
+    # Add items to rooms
+    kitchen.add_item(knife)
+    kitchen.add_item(cheese)
+    dining_hall.add_item(shield)
 
-# Create a new character in a different room
-harry = Enemy("harry", "Harry is a troll who has a phobia of showers.")
-harry.set_conversation("hehehe, you won't beat me!")
-harry.set_weakness(purified_water)
+    # Create Dave the Zombie
+    dave = Enemy("Dave", "Dave is a lactose intolerant zombie")
+    dave.set_conversation("Brrlgrh... must eat... rgrhl... braaaiinnnsss...")
+    dave.set_weakness(cheese)
+    dave.add_item(purified_water)
 
-ballroom.character = harry
+    dining_hall.character = dave
 
-# Create a friend character
-aurora = Friend("Aurora", "Aurora is a friendly elf.")
-aurora.set_conversation("Hello friend! Nice to see you!")
-aurora.add_item(sword)
-aurora.add_item(key)
+    # Create a new character in a different room
+    harry = Enemy("harry", "Harry is a troll who has a phobia of showers.")
+    harry.set_conversation("hehehe, you won't beat me!")
+    harry.set_weakness(purified_water)
+
+    ballroom.character = harry
+
+    # Create a friend character
+    aurora = Friend("Aurora", "Aurora is a friendly elf.")
+    aurora.set_conversation("Hello friend! Nice to see you!")
+    aurora.add_item(sword)
+    aurora.add_item(key)
+
+    kitchen.character = aurora
+
+    # Add a key to the game
+
+    # create inventory
+    inventory = []
+
+    # starting room
+    current_room = kitchen
 
 
-kitchen.character = aurora
-
-# Add a key to the game
-
-# create inventory
-inventory = []
-
-# starting room
-current_room = kitchen
-
-
-# restart functionality
-def restart_game():
-    python = sys.executable
-    os.execl(python, python, *sys.argv)
-
+initialize_game()
 
 while True:
     print("\n")
@@ -117,6 +116,12 @@ while True:
                 print(
                     "\n What is your weapon of choice? (Type 'stop' to end the fight): "
                 )
+                if inventory:
+                    print("Your inventory contains the following items:")
+                    for item in inventory:
+                        print(f"- {item.name}: {item.description}")
+                else:
+                    print("Your inventory is empty.")
                 combat_item_name = input("> ")
                 if combat_item_name == "stop":
                     print("You stopped fighting.")
@@ -125,17 +130,24 @@ while True:
                     (i for i in inventory if i.name == combat_item_name), None
                 )
                 if combat_item:
-                    if inhabitant.fight(combat_item):
-                        print(f"You have defeated {inhabitant.name}!")
-                        inhabitant.transfer_items2player(inventory)
-                        current_room.character = None
-                        break
+                    if (
+                        isinstance(combat_item, Weapon)
+                        or combat_item.name == inhabitant.get_weakness()
+                    ):
+                        if inhabitant.fight(combat_item):
+                            print(f"You have defeated {inhabitant.name}!")
+                            inhabitant.transfer_items2player(inventory)
+                            current_room.character = None
+                            break
                     else:
                         print(
-                            f"You don't have {combat_item_name} and are no match for {inhabitant.name}"
+                            f"{combat_item_name} is ineffective! You are no match for {inhabitant.name}!!"
                         )
                         print("Game Over!")
-                        restart_game()
+                        initialize_game()
+                        break
+                else:
+                    print(f"You don't have {combat_item_name} in your inventory.")
         else:
             print("There is no enemy here to fight.")
 
